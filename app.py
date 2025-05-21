@@ -1,65 +1,73 @@
-from flask import Flask, render_template, request, jsonify
-import numpy as np #pip install flask numpy
+from flask import Flask, render_template, request
+import numpy as np
 
 app = Flask(__name__)
 
-# Fungsi untuk mengenkripsi teks menggunakan Hill Cipher
-def hill_encrypt(plaintext, key_matrix):
-    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    n = len(key_matrix)
-    
-    # Membersihkan plaintext dari karakter non-alfabet
-    plaintext = ''.join([char.upper() for char in plaintext if char.isalpha()])
-    
-    # Menambahkan padding jika panjang plaintext tidak habis dibagi n
-    while len(plaintext) % n != 0:
-        plaintext += 'X'
-    
-    # Konversi plaintext ke angka (A=0, B=1, ..., Z=25)
-    numeric_text = [alphabet.index(char) for char in plaintext]
-    
-    # Membagi plaintext menjadi blok-blok berukuran n
-    blocks = [numeric_text[i:i+n] for i in range(0, len(numeric_text), n)]
-    
-    # Enkripsi setiap blok
-    ciphertext = ""
-    for block in blocks:
-        block_vector = np.array(block)
-        encrypted_block = np.dot(key_matrix, block_vector) % 26
-        for num in encrypted_block:
-            ciphertext += alphabet[num]
-    
-    return ciphertext
+# Fungsi Hill Cipher
+def mod_inverse(matrix, modulus):
+    det = int(np.round(np.linalg.det(matrix)))
+    det_inv = pow(det, -1, modulus)
+    matrix_modulus_inv = (
+        det_inv * np.round(det * np.linalg.inv(matrix)).astype(int) % modulus
+    )
+    return matrix_modulus_inv
 
-# Fungsi untuk memeriksa apakah matrix invertible modulo 26
-def is_invertible_mod(matrix):
-    det = int(round(np.linalg.det(matrix))) % 26
-    return det != 0 and all(det % i != 0 for i in [2, 13])
+def text_to_matrix(text, n):
+    text = text.upper().replace(" ", "")
+    while len(text) % n != 0:
+        text += "X"
+    matrix = [ord(c) - ord("A") for c in text]
+    return np.reshape(matrix, (-1, n)).T
+
+def matrix_to_text(matrix, n):
+    text = ""
+    for col in matrix.T:
+        for num in col:
+            text += chr((num % 26) + ord("A"))
+    return text
+
+def encrypt(plain_text, key_matrix):
+    n = key_matrix.shape[0]
+    plain_matrix = text_to_matrix(plain_text, n)
+    cipher_matrix = np.dot(key_matrix, plain_matrix) % 26
+    return matrix_to_text(cipher_matrix, n)
+
+def decrypt(cipher_text, key_matrix):
+    n = key_matrix.shape[0]
+    cipher_matrix = text_to_matrix(cipher_text, n)
+    key_inv = mod_inverse(key_matrix, 26)
+    plain_matrix = np.dot(key_inv, cipher_matrix) % 26
+    return matrix_to_text(plain_matrix, n)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    encrypted_text = ""
+    decrypted_text = ""
+
     if request.method == "POST":
-        try:
-            # Mendapatkan data dari form
-            plaintext = request.form.get("plaintext")
-            matrix_size = int(request.form.get("matrix_size"))
-            matrix_data = request.form.getlist("matrix[]")
-            
-            # Mengonversi matrix_data ke matriks numerik
-            key_matrix = np.array([int(num) for num in matrix_data]).reshape(matrix_size, matrix_size)
-            
-            # Memeriksa apakah matriks valid
-            if not is_invertible_mod(key_matrix):
-                return jsonify({"error": "Matrix tidak valid! Determinan harus coprime dengan 26."})
-            
-            # Melakukan enkripsi
-            ciphertext = hill_encrypt(plaintext, key_matrix)
-            return jsonify({"ciphertext": ciphertext})
-        
-        except Exception as e:
-            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"})
-    
-    return render_template("index.html")
+        if "encrypt" in request.form:
+            plaintext = request.form["plaintext"]
+            keytext = request.form["key"]
+            try:
+                key = np.array([int(x) for x in keytext.split()]).reshape(2, 2)
+                encrypted_text = encrypt(plaintext, key)
+            except:
+                encrypted_text = "Key tidak valid atau panjang teks tidak sesuai."
+
+        elif "decrypt" in request.form:
+            ciphertext = request.form["ciphertext"]
+            keytext = request.form["key"]
+            try:
+                key = np.array([int(x) for x in keytext.split()]).reshape(2, 2)
+                decrypted_text = decrypt(ciphertext, key)
+            except:
+                decrypted_text = "Key tidak valid atau panjang teks tidak sesuai."
+
+    return render_template(
+        "index.html",
+        encrypted_text=encrypted_text,
+        decrypted_text=decrypted_text
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

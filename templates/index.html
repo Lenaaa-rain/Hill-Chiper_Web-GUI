@@ -1,68 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hill Cipher</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>Hill Cipher</title>
+  <style>
+    body {
+      font-family: Arial;
+      display: flex;
+      justify-content: space-around;
+      padding-top: 50px;
+      background-color: #f4f4f4;
+    }
+    .box {
+      width: 45%;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    h2 {
+      text-align: center;
+    }
+    .result {
+      margin-top: 10px;
+      background: #e9ffe8;
+      padding: 10px;
+      color: green;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hill Cipher Encryption</h1>
-        <form id="cipherForm">
-            <label for="plaintext">Plaintext:</label>
-            <input type="text" id="plaintext" name="plaintext" required>
 
-            <label for="matrix_size">Matrix Size (N x N):</label>
-            <input type="number" id="matrix_size" name="matrix_size" min="2" value="2" required>
+  <div class="box">
+    <h2>🔐 Enkripsi</h2>
+    <form method="POST">
+      <label>Masukkan Teks:</label>
+      <textarea name="plaintext"></textarea>
+      <label>Kunci (misal: 3 2 5 7):</label>
+      <input type="text" name="key" placeholder="Contoh: 3 2 5 7">
+      <button type="submit" name="encrypt">Enkripsi</button>
+    </form>
+    {% if encrypted_text %}
+      <div class="result"><strong>Hasil Enkripsi:</strong> {{ encrypted_text }}</div>
+    {% endif %}
+  </div>
 
-            <div id="matrixInput"></div>
+  <div class="box">
+    <h2>🔓 Dekripsi</h2>
+    <form method="POST">
+      <label>Masukkan Ciphertext:</label>
+      <textarea name="ciphertext"></textarea>
+      <label>Kunci (misal: 3 2 5 7):</label>
+      <input type="text" name="key" placeholder="Contoh: 3 2 5 7">
+      <button type="submit" name="decrypt">Dekripsi</button>
+    </form>
+    {% if decrypted_text %}
+      <div class="result"><strong>Hasil Dekripsi:</strong> {{ decrypted_text }}</div>
+    {% endif %}
+  </div>
 
-            <button type="submit">Encrypt</button>
-        </form>
-
-        <div id="result">
-            <h2>Ciphertext:</h2>
-            <p id="ciphertext"></p>
-        </div>
-    </div>
-
-    <script>
-        document.getElementById("matrix_size").addEventListener("input", function () {
-            const size = parseInt(this.value);
-            const matrixInputDiv = document.getElementById("matrixInput");
-            matrixInputDiv.innerHTML = "";
-
-            for (let i = 0; i < size * size; i++) {
-                const input = document.createElement("input");
-                input.type = "number";
-                input.name = "matrix[]";
-                input.required = true;
-                matrixInputDiv.appendChild(input);
-            }
-        });
-
-        document.getElementById("cipherForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-
-            fetch("/", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    document.getElementById("ciphertext").textContent = data.ciphertext;
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        });
-
-        // Trigger initial matrix input generation
-        document.getElementById("matrix_size").dispatchEvent(new Event("input"));
-    </script>
 </body>
 </html>
