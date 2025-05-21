@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hill Cipher</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Hill Cipher Encryption</h1>
+        <form id="cipherForm">
+            <label for="plaintext">Plaintext:</label>
+            <input type="text" id="plaintext" name="plaintext" required>
+
+            <label for="matrix_size">Matrix Size (N x N):</label>
+            <input type="number" id="matrix_size" name="matrix_size" min="2" value="2" required>
+
+            <div id="matrixInput"></div>
+
+            <button type="submit">Encrypt</button>
+        </form>
+
+        <div id="result">
+            <h2>Ciphertext:</h2>
+            <p id="ciphertext"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("matrix_size").addEventListener("input", function () {
+            const size = parseInt(this.value);
+            const matrixInputDiv = document.getElementById("matrixInput");
+            matrixInputDiv.innerHTML = "";
+
+            for (let i = 0; i < size * size; i++) {
+                const input = document.createElement("input");
+                input.type = "number";
+                input.name = "matrix[]";
+                input.required = true;
+                matrixInputDiv.appendChild(input);
+            }
+        });
+
+        document.getElementById("cipherForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById("ciphertext").textContent = data.ciphertext;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+
+        // Trigger initial matrix input generation
+        document.getElementById("matrix_size").dispatchEvent(new Event("input"));
+    </script>
+</body>
+</html>
