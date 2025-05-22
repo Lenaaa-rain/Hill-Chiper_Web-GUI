@@ -47,4 +47,9 @@ Dekripsi:
 
 ## Screenshots
 
-![App Screenshot](/images/Screenshot%202025-05-22%20072918.png)
+![App Screenshot](/images/SS1.png)  
+![App Screenshot](/images/SS2.png)
+![App Screenshot](/images/SS3.png)
+![App Screenshot](/images/SS4.png)
+![App Screenshot](/images/SS5.png)
+![App Screenshot](/images/SS6.png)
