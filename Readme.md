@@ -45,7 +45,7 @@ Dekripsi:
   python app.py
 ```
 
-## Screenshots
+## Perhitungan Enkripsi menggunakan determinan
 
 ![App Screenshot](/images/SS1.png)  
 ![App Screenshot](/images/SS2.png)
