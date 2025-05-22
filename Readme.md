@@ -44,3 +44,7 @@ Dekripsi:
 ```bash
   python app.py
 ```
+
+## Screenshots
+
+![App Screenshot](/images/Screenshot%202025-05-22%20072918.png)
