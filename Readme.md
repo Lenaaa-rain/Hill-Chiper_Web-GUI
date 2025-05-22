@@ -53,3 +53,17 @@ Dekripsi:
 ![App Screenshot](/images/SS4.png)
 ![App Screenshot](/images/SS5.png)
 ![App Screenshot](/images/SS6.png)
+
+## Perhitungan Dekripsi menggunakan invers matrix
+
+![App Screenshot](/images/DD1.png)  
+![App Screenshot](/images/DD2.png)
+![App Screenshot](/images/DD3.png)
+![App Screenshot](/images/DD4.png)
+![App Screenshot](/images/DD5.png)
+![App Screenshot](/images/DD6.png)
+![App Screenshot](/images/DD7.png)  
+![App Screenshot](/images/DD8.png)
+![App Screenshot](/images/DD9.png)
+![App Screenshot](/images/DD10.png)
+![App Screenshot](/images/DD11.png)
